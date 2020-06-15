@@ -126,7 +126,8 @@ void InitData()
 	ResourcePath::imagePath = "./Imgs/" + ProjectName + "/";
 	///ResourcePath::modelPath = "./Model/UnionSphere.obj";
 	ResourcePath::modelPath = "./Model/Potion_bottle.obj";
-
+	ResourcePath::modelPath = "./Model/octopus.obj";
+	
 	//Initialize shaders
 	///////////////////////////	
 	drawModelShader.Init();
