@@ -2,6 +2,9 @@
 #include <Eigen/Sparse>
 #include <map>
 #include <algorithm>
+#include <stdio.h>
+
+#include <STB/stb_image.h>
 
 #define Quad
 //#define Harmonic
@@ -211,6 +214,33 @@ void MeshObject::DeleteSelectedFace(unsigned int faceID)
 {
 	selectedFace.erase(std::remove(selectedFace.begin(), selectedFace.end(), faceID), selectedFace.end());
 }
+
+std::vector<glm::vec3> MeshObject::GetSelectedFaces()
+{
+	std::vector<glm::vec3> foundEdges;
+	foundEdges.clear();
+
+	std::cout << "selectedFace: \n";
+
+	for (int i = 0; i < selectedFace.size(); i++)
+	{
+
+		/*for (OpenMesh::PolyConnectivity::FVIter fv_it = model.mesh.fv_iter(model.mesh.face_handle(selectedFace[i]));
+			fv_it != OMT::fv_end(chosenFace_iter); ++fv_it)
+		{
+			std::cout << "V\n";
+
+			///OMT::Point v = point(fv_it.handle());
+			///glVertex3dv(v.data());
+		}*/
+
+		
+		std::cout << selectedFace[i] << "\n";
+	}
+
+	return foundEdges;
+}
+
 
 bool MeshObject::FindClosestPoint(unsigned int faceID, glm::vec3 worldPos, glm::vec3& closestPos)
 {

@@ -22,4 +22,3 @@ private:
 	GLuint um4mvLocation;
 	GLuint pointColorLocation;
 };
-

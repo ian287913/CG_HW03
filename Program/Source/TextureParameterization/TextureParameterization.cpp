@@ -13,6 +13,8 @@
 #include "DrawPointShader.h"
 
 #include "DrawTargetShader.h"
+#include "MyGLMHelper.h"
+#include "MapPanel.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../../Include/STB/stb_image_write.h"
@@ -43,6 +45,7 @@ DrawPickingFaceShader drawPickingFaceShader;
 PickingShader pickingShader;
 PickingTexture pickingTexture;
 DrawPointShader drawPointShader;
+DrawPointShader draw2DPointShader;
 
 DrawTargetShader drawTargetShader;
 
@@ -65,6 +68,15 @@ SelectionMode selectionMode = ADD_FACE;
 TwBar* bar;
 TwEnumVal SelectionModeEV[] = { {ADD_FACE, "Add face"}, {DEL_FACE, "Delete face"}, {SELECT_POINT, "Point"}, {SELECT_TARGETS, "Targets"} };
 TwType SelectionModeType;
+
+/////	ian		/////
+MapPanel mapPanel;
+
+bool drawMap = false;
+float debug_x = 0;
+float debug_y = 0;
+float debug_z = 0;
+/////	ian		/////
 
 
 void SetupGUI()
@@ -125,8 +137,8 @@ void InitData()
 	ResourcePath::shaderPath = "./Shader/" + ProjectName + "/";
 	ResourcePath::imagePath = "./Imgs/" + ProjectName + "/";
 	///ResourcePath::modelPath = "./Model/UnionSphere.obj";
-	ResourcePath::modelPath = "./Model/Potion_bottle.obj";
-	ResourcePath::modelPath = "./Model/octopus.obj";
+	///ResourcePath::modelPath = "./Model/Potion_bottle.obj";
+	ResourcePath::modelPath = "./Model/Penguin.obj";
 	
 	//Initialize shaders
 	///////////////////////////	
@@ -135,8 +147,12 @@ void InitData()
 	pickingTexture.Init(windowWidth, windowHeight);
 	drawPickingFaceShader.Init();
 	drawPointShader.Init();
+	draw2DPointShader.Init();
 
 	glGenBuffers(1, &vboPoint);
+
+	//	Map Panel
+	mapPanel.Init();
 
 	//Load model to shader program
 	My_LoadModel();
@@ -156,13 +172,24 @@ void Reshape(int width, int height)
 	pickingTexture.Init(windowWidth, windowHeight);
 }
 
+void RenderMap()
+{
+	/////////////////////////////////////////////
+	//	try to get handle of model.mesh.selected faces
+
+	mapPanel.DrawBackground();
+	mapPanel.DrawEdges();
+	mapPanel.DrawVertices();
+}
+
+
 // GLUT callback. Called to draw the scene.
 void RenderMeshWindow()
 {
 	//Update shaders' input variable
 	///////////////////////////	
 
-	glm::mat4 mvMat = meshWindowCam.GetViewMatrix() * meshWindowCam.GetModelMatrix();
+	glm::mat4 mvMat = meshWindowCam.GetViewMatrix() * meshWindowCam.GetModelMatrix() * scale(14, 14, 14) * translate(0, -0.04, 0);
 	glm::mat4 pMat = meshWindowCam.GetProjectionMatrix(aspect);
 
 	// write faceID+1 to framebuffer
@@ -318,6 +345,13 @@ void RenderMeshWindow()
 
 	}
 
+	if (drawMap)
+	{
+		RenderMap();
+	}
+
+
+	//	UI
 	TwDraw();
 	glutSwapBuffers();
 }
@@ -391,9 +425,26 @@ void MyMouse(int button, int state, int x, int y)
 //Keyboard event
 void MyKeyboard(unsigned char key, int x, int y)
 {
-	if (!TwEventKeyboardGLUT(key, x, y))
+	/*if (!TwEventKeyboardGLUT(key, x, y))
 	{
 		meshWindowCam.keyEvents(key);
+	}*/
+	switch (key)
+	{
+	case 'q':
+		drawMap = !drawMap;
+		model.GetSelectedFaces();
+		break;
+	case 'a':
+		debug_x -= 0.1f;
+		cout << "debug_X = " << debug_x << "\n";
+		break;
+	case 'd':
+		debug_x += 0.1f;
+		cout << "debug_X = " << debug_x << "\n";
+		break;
+	default:
+		break;
 	}
 }
 
@@ -409,6 +460,8 @@ void MyMouseMoving(int x, int y) {
 		}
 	}
 }
+
+
 
 int main(int argc, char* argv[])
 {
