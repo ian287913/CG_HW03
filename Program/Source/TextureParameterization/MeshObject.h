@@ -101,7 +101,6 @@ public:
 	~MeshObject();
 	// Will
 	GLMesh patch;
-	std::map<int, OMT::FIter> sellectedFace_iterMap;
 
 	bool Init(std::string fileName);
 	void Render();

@@ -279,4 +279,8 @@ bool MeshObject::FindClosestPoint(unsigned int faceID, glm::vec3 worldPos, glm::
 void MeshObject::reInitPatch()
 {
 	patch.mesh.clear();
+	std::vector<MyMesh::VertexHandle> face_vhs;
+	std::map<int, MyMesh::VertexHandle> vhs;
+
+	
 }
