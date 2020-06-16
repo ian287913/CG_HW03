@@ -10,7 +10,6 @@ namespace OMT//OpenMesh Triangle mesh
 	using namespace std;
 	/*----------------------------------------------------------------------*/
 
-	/*�w�q�ϥΪ���ǫשM���ݩ�*/
 	struct MyTraits : OpenMesh::DefaultTraits
 	{
 		// let Point and Normal be a vector made from doubles
@@ -33,7 +32,6 @@ namespace OMT//OpenMesh Triangle mesh
 	};
 	/*----------------------------------------------------------------------*/
 
-	/*�w�q�`��type*/
 	typedef OpenMesh::TriMesh_ArrayKernelT<MyTraits>	    MyMesh;
 	typedef OpenMesh::Vec3d									Vector3d;	//Vec3D type
 	typedef MyMesh::Scalar									Scalar;	//Scalar type
@@ -52,12 +50,12 @@ namespace OMT//OpenMesh Triangle mesh
 	typedef MyMesh::FaceIter								FIter;	//FaceIter type
 	typedef MyMesh::FaceVertexIter							FVIter;	//FaceVertexIter type
 	typedef MyMesh::FaceEdgeIter							FEIter;	//FaceEdgeIter type
+	typedef MyMesh::FaceHalfedgeIter						FHEIter;	//FaceEdgeIter type
 	typedef MyMesh::FaceFaceIter							FFIter;	//FaceFaceIter type
 	typedef MyMesh::VertexOHalfedgeIter						VOHEIter;	//VertexOutHalfEdge type
 	typedef MyMesh::ConstVertexVertexIter					CVVIter;	//ConstVertexVertexIter type
 	/*----------------------------------------------------------------------*/
 
-	/*�w�q�B�~��Ƶ��c*/
 	using namespace OpenMesh;
 	/*----------------------------------------------------------------------*/
 
@@ -81,16 +79,19 @@ public:
 	GLMesh();
 	~GLMesh();
 
+	// Will
+	// Will
+
 	bool Init(std::string fileName);
 	void Render();
 
 	MyMesh mesh;
+	MyMesh *mesh_p;
 	GLuint vao;
 	GLuint ebo;
 	GLuint vboVertices, vboNormal;
 
 private:
-
 	bool LoadModel(std::string fileName);
 	void LoadToShader();
 };
@@ -100,6 +101,9 @@ class MeshObject
 public:
 	MeshObject();
 	~MeshObject();
+	// Will
+	GLMesh patch;
+	std::map<int, OMT::FIter> sellectedFace_iterMap;
 
 	bool Init(std::string fileName);
 	void Render();
@@ -109,13 +113,20 @@ public:
 	bool FindClosestPoint(unsigned int faceID, glm::vec3 worldPos, glm::vec3& closestPos);
 
 	//	ian: try to get handles of selectedFaces
-	std::vector<glm::vec3> GetSelectedFaces();
+	std::vector<int> GetSelectedFaces();
+	void MeshObject::Parameterization(float uvRotateAngle);
+	std::vector<glm::vec3> boundPoints;
 
 private:
 	GLMesh model;
 	std::vector<unsigned int> selectedFace;
 	std::vector<unsigned int*> fvIDsPtr;
 	std::vector<int> elemCount;
+	//	ian
+	void CopySelectFace(MyMesh& model);
+
+	// Will
+	void reInitPatch();
 
 };
 
