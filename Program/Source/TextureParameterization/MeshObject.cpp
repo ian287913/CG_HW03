@@ -299,3 +299,9 @@ bool MeshObject::FindClosestPoint(unsigned int faceID, glm::vec3 worldPos, glm::
 	closestPos.z = closestPoint[2];
 	return true;
 }
+
+// Will
+void MeshObject::reInitPatch()
+{
+	patch.mesh.clear();
+}

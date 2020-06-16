@@ -89,12 +89,6 @@
     <ClInclude Include="..\..\Source\TextureParameterization\DrawTargetShader.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\TextureParameterization\MyGLMHelper.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\TextureParameterization\MapPanel.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Assets\Shader\TextureParameterization\drawModel.fs.glsl">
