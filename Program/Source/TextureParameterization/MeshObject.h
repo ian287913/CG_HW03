@@ -10,7 +10,6 @@ namespace OMT//OpenMesh Triangle mesh
 	using namespace std;
 	/*----------------------------------------------------------------------*/
 
-	/*�w�q�ϥΪ���ǫשM���ݩ�*/
 	struct MyTraits : OpenMesh::DefaultTraits
 	{
 		// let Point and Normal be a vector made from doubles
@@ -33,7 +32,6 @@ namespace OMT//OpenMesh Triangle mesh
 	};
 	/*----------------------------------------------------------------------*/
 
-	/*�w�q�`��type*/
 	typedef OpenMesh::TriMesh_ArrayKernelT<MyTraits>	    MyMesh;
 	typedef OpenMesh::Vec3d									Vector3d;	//Vec3D type
 	typedef MyMesh::Scalar									Scalar;	//Scalar type
@@ -57,7 +55,6 @@ namespace OMT//OpenMesh Triangle mesh
 	typedef MyMesh::ConstVertexVertexIter					CVVIter;	//ConstVertexVertexIter type
 	/*----------------------------------------------------------------------*/
 
-	/*�w�q�B�~��Ƶ��c*/
 	using namespace OpenMesh;
 	/*----------------------------------------------------------------------*/
 
