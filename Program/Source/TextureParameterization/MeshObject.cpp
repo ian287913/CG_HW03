@@ -98,7 +98,7 @@ bool GLMesh::LoadModel(std::string fileName)
 			mesh.update_normals();
 			mesh.release_face_normals();
 		}
-
+		mesh_p = &mesh;
 		return true;
 	}
 
@@ -160,7 +160,7 @@ void GLMesh::LoadToShader()
 
 MeshObject::MeshObject()
 {
-	
+
 }
 
 MeshObject::~MeshObject()
@@ -215,28 +215,53 @@ void MeshObject::DeleteSelectedFace(unsigned int faceID)
 	selectedFace.erase(std::remove(selectedFace.begin(), selectedFace.end(), faceID), selectedFace.end());
 }
 
-std::vector<glm::vec3> MeshObject::GetSelectedFaces()
+std::vector<int> MeshObject::GetSelectedFaces()
 {
-	std::vector<glm::vec3> foundEdges;
+	std::vector<int> foundEdges;
 	foundEdges.clear();
 
 	std::cout << "selectedFace: \n";
 
+
+
 	for (int i = 0; i < selectedFace.size(); i++)
 	{
+		std::cout << "F: " << selectedFace[i] << "\n";
 
-		/*for (OpenMesh::PolyConnectivity::FVIter fv_it = model.mesh.fv_iter(model.mesh.face_handle(selectedFace[i]));
-			fv_it != OMT::fv_end(chosenFace_iter); ++fv_it)
+		//	each EDGE of this FACE
+		for (MyMesh::FEIter e_it = model.mesh.fe_begin(model.mesh.face_handle(selectedFace[i]));
+			e_it != model.mesh.fe_end(model.mesh.face_handle(selectedFace[i])); ++e_it)
 		{
-			std::cout << "V\n";
 
-			///OMT::Point v = point(fv_it.handle());
-			///glVertex3dv(v.data());
+			int id = (*e_it).idx();
+			if (std::find(foundEdges.begin(), foundEdges.end(), id) == foundEdges.end())
+			{
+				std::cout << "add " << (*e_it) << " : " << id << "\n";
+
+				foundEdges.push_back(id);
+			}
+
+
+			//OpenMesh::Vec3f v = model.mesh.point(*(fv_it));
+			//std::cout << v[0] << ", " << v[1] << ", " << v[2] << "\n";
+
+		}
+
+		//	each VERTEX of this FACE
+		/*for (MyMesh::FVIter fv_it = model.mesh.fv_iter(model.mesh.face_handle(selectedFace[i]));
+			fv_it != model.mesh.fv_end(model.mesh.face_handle(selectedFace[i])); ++fv_it)
+		{
+			std::cout << "V " << (*fv_it) << "\n";
+
+			OpenMesh::Vec3f v = model.mesh.point(*(fv_it));
+			std::cout << v[0] << ", " << v[1] << ", " << v[2] << "\n";
 		}*/
 
-		
-		std::cout << selectedFace[i] << "\n";
+
 	}
+
+	std::cout << "TotalEdge: " << foundEdges.size() << "\n";
+
 
 	return foundEdges;
 }
@@ -249,7 +274,7 @@ bool MeshObject::FindClosestPoint(unsigned int faceID, glm::vec3 worldPos, glm::
 	{
 		return false;
 	}
-	
+
 	double minDistance = 0.0;
 	MyMesh::Point p(worldPos.x, worldPos.y, worldPos.z);
 	MyMesh::FVIter fv_it = model.mesh.fv_iter(fh);

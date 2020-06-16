@@ -142,7 +142,7 @@ void InitData()
 	///ResourcePath::modelPath = "./Model/UnionSphere.obj";
 	///ResourcePath::modelPath = "./Model/Potion_bottle.obj";
 	ResourcePath::modelPath = "./Model/Penguin.obj";
-	
+
 	//Initialize shaders
 	///////////////////////////	
 	drawModelShader.Init();
@@ -210,7 +210,7 @@ void RenderMeshWindow()
 	pickingShader.Disable();
 	pickingTexture.Disable();
 
-	
+
 	// draw model
 	glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -230,7 +230,7 @@ void RenderMeshWindow()
 	model.Render();
 
 	drawModelShader.Disable();
-	
+
 	// render selected face
 	if (selectionMode == SelectionMode::ADD_FACE || selectionMode == SelectionMode::DEL_FACE)
 	{
@@ -270,11 +270,9 @@ void RenderMeshWindow()
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 			glMultMatrixf(glm::value_ptr(pMat));
-
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
 			glMultMatrixf(glm::value_ptr(mvMat));
-
 			glPointSize(15.0f);
 			glColor3f(1.0, 0.0, 1.0);
 			glBegin(GL_POINTS);
@@ -282,7 +280,7 @@ void RenderMeshWindow()
 			glEnd();
 		glPopAttrib();
 		glPopMatrix();*/
-		
+
 		glBindBuffer(GL_ARRAY_BUFFER, vboPoint);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3), glm::value_ptr(worldPos), GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -513,4 +511,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
