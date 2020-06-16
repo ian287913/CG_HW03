@@ -10,6 +10,7 @@ namespace OMT//OpenMesh Triangle mesh
 	using namespace std;
 	/*----------------------------------------------------------------------*/
 
+	/*�w�q�ϥΪ���ǫשM���ݩ�*/
 	struct MyTraits : OpenMesh::DefaultTraits
 	{
 		// let Point and Normal be a vector made from doubles
@@ -32,6 +33,7 @@ namespace OMT//OpenMesh Triangle mesh
 	};
 	/*----------------------------------------------------------------------*/
 
+	/*�w�q�`��type*/
 	typedef OpenMesh::TriMesh_ArrayKernelT<MyTraits>	    MyMesh;
 	typedef OpenMesh::Vec3d									Vector3d;	//Vec3D type
 	typedef MyMesh::Scalar									Scalar;	//Scalar type
@@ -55,6 +57,7 @@ namespace OMT//OpenMesh Triangle mesh
 	typedef MyMesh::ConstVertexVertexIter					CVVIter;	//ConstVertexVertexIter type
 	/*----------------------------------------------------------------------*/
 
+	/*�w�q�B�~��Ƶ��c*/
 	using namespace OpenMesh;
 	/*----------------------------------------------------------------------*/
 
@@ -78,9 +81,6 @@ public:
 	GLMesh();
 	~GLMesh();
 
-	// Will
-	// Will
-
 	bool Init(std::string fileName);
 	void Render();
 
@@ -90,6 +90,7 @@ public:
 	GLuint vboVertices, vboNormal;
 
 private:
+
 	bool LoadModel(std::string fileName);
 	void LoadToShader();
 };
@@ -99,9 +100,6 @@ class MeshObject
 public:
 	MeshObject();
 	~MeshObject();
-	// Will
-	GLMesh patch;
-	std::map<int, OMT::FIter> sellectedFace_iterMap;
 
 	bool Init(std::string fileName);
 	void Render();
@@ -118,8 +116,6 @@ private:
 	std::vector<unsigned int> selectedFace;
 	std::vector<unsigned int*> fvIDsPtr;
 	std::vector<int> elemCount;
-	// Will
-	void reInitPatch();
 
 };
 
