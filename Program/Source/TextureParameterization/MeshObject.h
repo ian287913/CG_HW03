@@ -114,12 +114,17 @@ public:
 
 	//	ian: try to get handles of selectedFaces
 	std::vector<int> GetSelectedFaces();
+	void MeshObject::Parameterization(float uvRotateAngle);
+	std::vector<glm::vec3> boundPoints;
 
 private:
 	GLMesh model;
 	std::vector<unsigned int> selectedFace;
 	std::vector<unsigned int*> fvIDsPtr;
 	std::vector<int> elemCount;
+	//	ian
+	void CopySelectFace(MyMesh& model);
+
 	// Will
 	void reInitPatch();
 

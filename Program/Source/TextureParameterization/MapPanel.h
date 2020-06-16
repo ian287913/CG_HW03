@@ -101,7 +101,7 @@ void MapPanel::DrawBackground()
 }
 void MapPanel::DrawVertices()
 {
-	if (edges.size() < 1) return;
+	if (vertices.size() < 1) return;
 
 	//	draw points
 	/*vertices.clear();
