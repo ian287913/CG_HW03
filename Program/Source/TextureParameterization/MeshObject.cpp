@@ -298,6 +298,7 @@ bool MeshObject::FindClosestPoint(unsigned int faceID, glm::vec3 worldPos, glm::
 	closestPos.y = closestPoint[1];
 	closestPos.z = closestPoint[2];
 	return true;
+<<<<<<< HEAD
 }
 
 // Will
@@ -307,4 +308,7 @@ void MeshObject::reInitPatch()
 	std::vector<MyMesh::VertexHandle> face_vhs;
 	std::map<int, MyMesh::VertexHandle> vhs;
 
+	
+=======
+>>>>>>> parent of 7d94bc3... Merge branch 'master' of https://github.com/ian287913/CG_HW03
 }
