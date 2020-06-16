@@ -82,48 +82,6 @@ public:
 	~GLMesh();
 
 	// Will
-	// static GLuint loadShader(char*, char*);
-	// void setShader(char*, char*);	
-	void init(void);
-	std::vector<unsigned int> selectedFace;
-	std::set<unsigned int> selectedFaceSet;
-	std::vector<MyMesh::TexCoord2D> texCoords;
-	std::vector<glm::vec2> edgeConnectivity;
-	std::vector<unsigned int*> fvIDsPtr;
-	std::vector<int> elemCount;
-	void LoadTexCoordToShader();
-	void Parameterization(float);
-	void load2Buffer();
-	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec3> verticesIdx;
-	std::vector<GLuint> faceVertexIndex;
-	std::vector<glm::vec3> faceIndex;
-	GLfloat* faceIndices;
-	std::vector<GLuint> edgeVertexIndex;
-	std::vector<glm::vec2> uvs;
-	std::vector<glm::vec3> normals;
-	int verticesSize = 0;
-	int verticesIdxSize = 0;
-	int faceVertexSize = 0;
-	int edgeVertexSize = 0;
-	int uvsSize = 0;
-	int normalsSize = 0;
-	int patchVerticesSize = 0;
-	int patchEdgesSize = 0;
-	GLuint shaderProgram;
-	GLuint texProgram;
-	GLuint pointVBO;
-	GLuint pointIdxVBO;
-	GLuint faceIdxVBO;
-	GLuint normalVBO;
-	GLuint texCoordVBO;
-	GLuint pointEBO;
-	GLuint edgeEBO;
-	GLuint M_KaID;
-	GLuint M_KdID;
-	GLuint M_KsID;
-	GLint MatricesIdx;
-	GLuint ModelID;
 	// Will
 
 	bool Init(std::string fileName);
