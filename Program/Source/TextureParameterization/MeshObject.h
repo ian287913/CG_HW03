@@ -102,8 +102,11 @@ class MeshObject
 public:
 	MeshObject();
 	~MeshObject();
+<<<<<<< HEAD
 	// Will
 	GLMesh patch;
+=======
+>>>>>>> parent of 7d94bc3... Merge branch 'master' of https://github.com/ian287913/CG_HW03
 
 	bool Init(std::string fileName);
 	void Render();
