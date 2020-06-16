@@ -76,9 +76,6 @@ bool drawMap = false;
 float debug_x = 0;
 float debug_y = 0;
 float debug_z = 0;
-
-//	texture
-GLuint TextureID;
 /////	ian		/////
 
 
@@ -435,13 +432,8 @@ void MyKeyboard(unsigned char key, int x, int y)
 	switch (key)
 	{
 	case 'q':
-		///model.GetSelectedFaces();
-		model.Parameterization(0);
-		mapPanel.vertices = model.boundPoints;
-		mapPanel.edges = model.boundPoints;
-		///cout << mapPanel.vertices.size() << " : " << model.boundPoints.size() << "\n";
 		drawMap = !drawMap;
-
+		model.GetSelectedFaces();
 		break;
 	case 'a':
 		debug_x -= 0.1f;
