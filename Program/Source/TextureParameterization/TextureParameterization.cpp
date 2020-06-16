@@ -106,8 +106,8 @@ void My_LoadTextures()
 	//Texture setting
 	///////////////////////////	
 	//Load texture data from file
-	///TextureData tdata = Common::Load_png((ResourcePath::imagePath + "checkerboard4.jpg").c_str());
-	TextureData tdata = Common::Load_png((ResourcePath::imagePath + "checkerboard4.png").c_str());
+	TextureData tdata = Common::Load_png((ResourcePath::imagePath + "checkerboard4.jpg").c_str());
+	///TextureData tdata = Common::Load_png((ResourcePath::imagePath + "checkerboard4.png").c_str());
 	//TextureData tdata = Common::Load_png(("./Imgs/" + ProjectName + "/wood.png").c_str());
 
 	//Generate empty texture
@@ -220,21 +220,23 @@ void RenderMeshWindow()
 	glm::mat4 mvMat = meshWindowCam.GetViewMatrix() * meshWindowCam.GetModelMatrix() * scale(14, 14, 14) * translate(0, -0.04, 0);
 	glm::mat4 pMat = meshWindowCam.GetProjectionMatrix(aspect);
 
-	// write faceID+1 to framebuffer
-	pickingTexture.Enable();
+	if (selectionMode == SelectionMode::ADD_FACE || selectionMode == SelectionMode::DEL_FACE)
+	{
+		// write faceID+1 to framebuffer
+		pickingTexture.Enable();
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	pickingShader.Enable();
-	pickingShader.SetMVMat(value_ptr(mvMat));
-	pickingShader.SetPMat(value_ptr(pMat));
+		pickingShader.Enable();
+		pickingShader.SetMVMat(value_ptr(mvMat));
+		pickingShader.SetPMat(value_ptr(pMat));
 
-	model.Render();
+		model.Render();
 
-	pickingShader.Disable();
-	pickingTexture.Disable();
-
+		pickingShader.Disable();
+		pickingTexture.Disable();
+	}
 
 	// draw model
 	glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
@@ -243,18 +245,21 @@ void RenderMeshWindow()
 	drawModelShader.Enable();
 	glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(mvMat)));
 
+	float radian = 0.0f * M_PI / 180.0f;
+	glm::mat4 uvRotMat = glm::rotate(radian, glm::vec3(0.0, 0.0, 1.0));
+
 	drawModelShader.SetWireColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	drawModelShader.SetFaceColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	drawModelShader.UseLighting(true);
-	drawModelShader.DrawWireframe(true);
-	///	
+	drawModelShader.DrawTexCoord(false);
+	drawModelShader.DrawTexture(false);
+	drawModelShader.DrawWireframe(!(selectionMode == SelectionMode::SELECT_TARGETS));
 	drawModelShader.SetNormalMat(normalMat);
 	drawModelShader.SetMVMat(mvMat);
 	drawModelShader.SetPMat(pMat);
+	drawModelShader.SetUVRotMat(uvRotMat);
 
 	model.Render();
-
-	drawModelShader.Disable();
 
 	// render selected face
 	if (selectionMode == SelectionMode::ADD_FACE || selectionMode == SelectionMode::DEL_FACE)
@@ -342,7 +347,7 @@ void RenderMeshWindow()
 		drawModelShader.UseLighting(true);
 		drawModelShader.DrawTexCoord(false);
 		drawModelShader.DrawTexture(false);
-		drawModelShader.DrawWireframe(true);
+		drawModelShader.DrawWireframe(false);
 		drawModelShader.SetNormalMat(normalMat);
 		drawModelShader.SetMVMat(mvMat);
 		drawModelShader.SetPMat(pMat);
@@ -404,7 +409,7 @@ void RenderMeshWindow()
 
 	}
 
-	
+	drawModelShader.Disable();
 
 	if (drawMap)
 	{
