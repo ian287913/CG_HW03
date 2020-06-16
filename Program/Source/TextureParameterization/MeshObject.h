@@ -50,7 +50,6 @@ namespace OMT//OpenMesh Triangle mesh
 	typedef MyMesh::FaceIter								FIter;	//FaceIter type
 	typedef MyMesh::FaceVertexIter							FVIter;	//FaceVertexIter type
 	typedef MyMesh::FaceEdgeIter							FEIter;	//FaceEdgeIter type
-	typedef MyMesh::FaceHalfedgeIter						FHEIter;	//FaceEdgeIter type
 	typedef MyMesh::FaceFaceIter							FFIter;	//FaceFaceIter type
 	typedef MyMesh::VertexOHalfedgeIter						VOHEIter;	//VertexOutHalfEdge type
 	typedef MyMesh::ConstVertexVertexIter					CVVIter;	//ConstVertexVertexIter type
@@ -86,7 +85,6 @@ public:
 	void Render();
 
 	MyMesh mesh;
-	MyMesh *mesh_p;
 	GLuint vao;
 	GLuint ebo;
 	GLuint vboVertices, vboNormal;
@@ -112,7 +110,7 @@ public:
 	bool FindClosestPoint(unsigned int faceID, glm::vec3 worldPos, glm::vec3& closestPos);
 
 	//	ian: try to get handles of selectedFaces
-	std::vector<int> GetSelectedFaces();
+	std::vector<glm::vec3> GetSelectedFaces();
 
 private:
 	GLMesh model;

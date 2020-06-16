@@ -98,7 +98,7 @@ bool GLMesh::LoadModel(std::string fileName)
 			mesh.update_normals();
 			mesh.release_face_normals();
 		}
-		mesh_p = &mesh;
+
 		return true;
 	}
 
@@ -215,53 +215,28 @@ void MeshObject::DeleteSelectedFace(unsigned int faceID)
 	selectedFace.erase(std::remove(selectedFace.begin(), selectedFace.end(), faceID), selectedFace.end());
 }
 
-std::vector<int> MeshObject::GetSelectedFaces()
+std::vector<glm::vec3> MeshObject::GetSelectedFaces()
 {
-	std::vector<int> foundEdges;
+	std::vector<glm::vec3> foundEdges;
 	foundEdges.clear();
 
 	std::cout << "selectedFace: \n";
 
-	
-
 	for (int i = 0; i < selectedFace.size(); i++)
 	{
-		std::cout << "F: " << selectedFace[i] << "\n";
 
-		//	each EDGE of this FACE
-		for (MyMesh::FEIter e_it = model.mesh.fe_begin(model.mesh.face_handle(selectedFace[i])); 
-			e_it != model.mesh.fe_end(model.mesh.face_handle(selectedFace[i])); ++e_it)
+		/*for (OpenMesh::PolyConnectivity::FVIter fv_it = model.mesh.fv_iter(model.mesh.face_handle(selectedFace[i]));
+			fv_it != OMT::fv_end(chosenFace_iter); ++fv_it)
 		{
+			std::cout << "V\n";
 
-			int id = (*e_it).idx();
-			if (std::find(foundEdges.begin(), foundEdges.end(), id) == foundEdges.end())
-			{
-				std::cout << "add " << (*e_it) << " : " << id << "\n";
-
-				foundEdges.push_back(id);
-			}
-
-			
-			//OpenMesh::Vec3f v = model.mesh.point(*(fv_it));
-			//std::cout << v[0] << ", " << v[1] << ", " << v[2] << "\n";
-
-		}
-
-		//	each VERTEX of this FACE
-		/*for (MyMesh::FVIter fv_it = model.mesh.fv_iter(model.mesh.face_handle(selectedFace[i]));
-			fv_it != model.mesh.fv_end(model.mesh.face_handle(selectedFace[i])); ++fv_it)
-		{
-			std::cout << "V " << (*fv_it) << "\n";
-			
-			OpenMesh::Vec3f v = model.mesh.point(*(fv_it));
-			std::cout << v[0] << ", " << v[1] << ", " << v[2] << "\n";
+			///OMT::Point v = point(fv_it.handle());
+			///glVertex3dv(v.data());
 		}*/
 
 		
+		std::cout << selectedFace[i] << "\n";
 	}
-
-	std::cout << "TotalEdge: " << foundEdges.size() << "\n";
-
 
 	return foundEdges;
 }
