@@ -94,6 +94,8 @@ void GLMesh::LoadTexCoordToShader()
 		for (MyMesh::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it)
 		{
 			MyMesh::TexCoord2D texCoord = mesh.texcoord2D(*v_it);
+			texCoord[0] += texOffsetX;
+			texCoord[1] += texOffsetY;
 			texCoords.push_back(texCoord);
 		}
 

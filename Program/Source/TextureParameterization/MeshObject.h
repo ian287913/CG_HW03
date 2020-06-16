@@ -80,6 +80,8 @@ public:
 	~GLMesh();
 
 	// Will
+	float texOffsetX = 0.0f;
+	float texOffsetY = 0.0f;
 	// Will
 
 	bool Init(std::string fileName);
@@ -119,8 +121,9 @@ public:
 	std::vector<glm::vec3> boundPoints;
 	void MeshObject::RenderParameterized();
 
-private:
 	GLMesh model;
+
+private:
 	std::vector<unsigned int> selectedFace;
 	std::vector<unsigned int*> fvIDsPtr;
 	std::vector<int> elemCount;

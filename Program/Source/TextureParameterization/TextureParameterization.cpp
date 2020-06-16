@@ -509,10 +509,26 @@ void MyKeyboard(unsigned char key, int x, int y)
 	case 'a':
 		debug_x -= 0.1f;
 		cout << "debug_X = " << debug_x << "\n";
+		model.model.texOffsetX = debug_x;
+		model.Parameterization(0);
 		break;
 	case 'd':
 		debug_x += 0.1f;
 		cout << "debug_X = " << debug_x << "\n";
+		model.model.texOffsetX = debug_x;
+		model.Parameterization(0);
+		break;
+	case 'w':
+		debug_y += 0.1f;
+		cout << "debug_Y = " << debug_y << "\n";
+		model.model.texOffsetY = debug_y;
+		model.Parameterization(0);
+		break;
+	case 's':
+		debug_y -= 0.1f;
+		cout << "debug_Y = " << debug_y << "\n";
+		model.model.texOffsetY = debug_y;
+		model.Parameterization(0);
 		break;
 	default:
 		break;
