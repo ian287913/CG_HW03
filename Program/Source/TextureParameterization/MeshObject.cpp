@@ -1,10 +1,6 @@
 #include "MeshObject.h"
 #include <Eigen/Sparse>
 #include <map>
-#include <algorithm>
-#include <stdio.h>
-
-#include <STB/stb_image.h>
 
 #define Quad
 //#define Harmonic
@@ -98,7 +94,7 @@ bool GLMesh::LoadModel(std::string fileName)
 			mesh.update_normals();
 			mesh.release_face_normals();
 		}
-		mesh_p = &mesh;
+
 		return true;
 	}
 
@@ -156,11 +152,35 @@ void GLMesh::LoadToShader()
 	glBindVertexArray(0);
 }
 
+void GLMesh::LoadTexCoordToShader()
+{
+	if (mesh.has_vertex_texcoords2D())
+	{
+		std::vector<MyMesh::TexCoord2D> texCoords;
+		for (MyMesh::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it)
+		{
+			MyMesh::TexCoord2D texCoord = mesh.texcoord2D(*v_it);
+			texCoords.push_back(texCoord);
+		}
+
+		glBindVertexArray(vao);
+
+		glGenBuffers(1, &vboTexCoord);
+		glBindBuffer(GL_ARRAY_BUFFER, vboTexCoord);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(MyMesh::TexCoord2D) * texCoords.size(), &texCoords[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(2);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
+}
+
 #pragma endregion
 
 MeshObject::MeshObject()
 {
-	
+
 }
 
 MeshObject::~MeshObject()
@@ -210,96 +230,6 @@ bool MeshObject::AddSelectedFace(unsigned int faceID)
 	return false;
 }
 
-void MeshObject::DeleteSelectedFace(unsigned int faceID)
-{
-	selectedFace.erase(std::remove(selectedFace.begin(), selectedFace.end(), faceID), selectedFace.end());
-}
-
-std::vector<int> MeshObject::GetSelectedFaces()
-{
-	std::vector<int> foundEdges;
-	foundEdges.clear();
-
-	std::cout << "selectedFace: \n";
-
-	
-
-	for (int i = 0; i < selectedFace.size(); i++)
-	{
-		std::cout << "F: " << selectedFace[i] << "\n";
-
-		//	each EDGE of this FACE
-		for (MyMesh::FEIter e_it = model.mesh.fe_begin(model.mesh.face_handle(selectedFace[i])); 
-			e_it != model.mesh.fe_end(model.mesh.face_handle(selectedFace[i])); ++e_it)
-		{
-
-			int id = (*e_it).idx();
-			if (std::find(foundEdges.begin(), foundEdges.end(), id) == foundEdges.end())
-			{
-				std::cout << "add " << (*e_it) << " : " << id << "\n";
-
-				foundEdges.push_back(id);
-			}
-
-			
-			//OpenMesh::Vec3f v = model.mesh.point(*(fv_it));
-			//std::cout << v[0] << ", " << v[1] << ", " << v[2] << "\n";
-
-		}
-
-		//	each VERTEX of this FACE
-		/*for (MyMesh::FVIter fv_it = model.mesh.fv_iter(model.mesh.face_handle(selectedFace[i]));
-			fv_it != model.mesh.fv_end(model.mesh.face_handle(selectedFace[i])); ++fv_it)
-		{
-			std::cout << "V " << (*fv_it) << "\n";
-			
-			OpenMesh::Vec3f v = model.mesh.point(*(fv_it));
-			std::cout << v[0] << ", " << v[1] << ", " << v[2] << "\n";
-		}*/
-
-		
-	}
-
-	std::cout << "TotalEdge: " << foundEdges.size() << "\n";
-
-
-	return foundEdges;
-}
-
-
-bool MeshObject::FindClosestPoint(unsigned int faceID, glm::vec3 worldPos, glm::vec3& closestPos)
-{
-	OpenMesh::FaceHandle fh = model.mesh.face_handle(faceID);
-	if (!fh.is_valid())
-	{
-		return false;
-	}
-	
-	double minDistance = 0.0;
-	MyMesh::Point p(worldPos.x, worldPos.y, worldPos.z);
-	MyMesh::FVIter fv_it = model.mesh.fv_iter(fh);
-	MyMesh::VertexHandle closestVH = *fv_it;
-	MyMesh::Point v1 = model.mesh.point(*fv_it);
-	++fv_it;
-
-	minDistance = (p - v1).norm();
-	for (; fv_it.is_valid(); ++fv_it)
-	{
-		MyMesh::Point v = model.mesh.point(*fv_it);
-		double distance = (p - v).norm();
-		if (minDistance > distance)
-		{
-			minDistance = distance;
-			closestVH = *fv_it;
-		}
-	}
-	MyMesh::Point closestPoint = model.mesh.point(closestVH);
-	closestPos.x = closestPoint[0];
-	closestPos.y = closestPoint[1];
-	closestPos.z = closestPoint[2];
-	return true;
-}
-
 void MeshObject::Parameterization(float uvRotateAngle)
 {
 	if (selectedFace.size() <= 0)
@@ -316,8 +246,8 @@ void MeshObject::Parameterization(float uvRotateAngle)
 	mesh.add_property(row, "row");
 	mesh.request_vertex_texcoords2D();
 
-	//	clone selected
 	CopySelectFace(mesh);
+
 
 	//calculate weight
 	MyMesh::HalfedgeHandle heh;
@@ -331,6 +261,30 @@ void MeshObject::Parameterization(float uvRotateAngle)
 			MyMesh::Point pTo = mesh.point(mesh.to_vertex_handle(_heh));
 			MyMesh::Point p1 = mesh.point(mesh.opposite_vh(_heh));
 			MyMesh::Point p2 = mesh.point(mesh.opposite_he_opposite_vh(_heh));
+
+#ifdef Harmonic
+			OpenMesh::Vec3d v1 = (OpenMesh::Vec3d)(p1 - pFrom);
+			v1.normalize();
+
+			OpenMesh::Vec3d v2 = (OpenMesh::Vec3d)(p1 - pTo);
+			v2.normalize();
+
+			angle1 = std::acos(OpenMesh::dot(v1, v2));
+
+
+			v1 = (OpenMesh::Vec3d)(p2 - pFrom);
+			v1.normalize();
+
+			v2 = (OpenMesh::Vec3d)(p2 - pTo);
+			v2.normalize();
+
+			angle2 = std::acos(OpenMesh::dot(v1, v2));
+
+			w = std::cos(angle1) / std::sin(angle1) + std::cos(angle2) / std::sin(angle2);
+
+			mesh.property(heWeight, _heh) = w;
+			mesh.property(heWeight, mesh.opposite_halfedge_handle(_heh)) = w;
+#else
 			double edgeLen = (pFrom - pTo).length();
 
 			// weight from to
@@ -367,6 +321,9 @@ void MeshObject::Parameterization(float uvRotateAngle)
 			w = (std::tan(angle1 / 2.0f) + std::tan(angle2 / 2.0f)) / edgeLen;
 
 			mesh.property(heWeight, mesh.opposite_halfedge_handle(_heh)) = w;
+
+#endif
+
 
 		}
 		else
@@ -408,6 +365,9 @@ void MeshObject::Parameterization(float uvRotateAngle)
 
 		hehNext = mesh.next_halfedge_handle(hehNext);
 	} while (heh != hehNext);
+
+
+#ifdef Quad
 
 	float rd = (225 + uvRotateAngle) * M_PI / 180.0;
 	float initDist = 0;
@@ -494,6 +454,21 @@ void MeshObject::Parameterization(float uvRotateAngle)
 
 		mesh.set_texcoord2D(vhs[i], st);
 	}
+#else
+
+	MyMesh::TexCoord2D st(1, 0.5);
+	mesh.set_texcoord2D(vhs[0], st);
+
+	for (int i = 1; i < vhs.size(); ++i)
+	{
+		double angle = 2 * M_PI * segLength[i - 1] / perimeter;
+
+		st[0] = (std::cos(angle) + 1) / 2;
+		st[1] = (std::sin(angle) + 1) / 2;
+
+		mesh.set_texcoord2D(vhs[i], st);
+	}
+#endif
 
 	typedef Eigen::SparseMatrix<double> SpMat;
 
@@ -566,38 +541,6 @@ void MeshObject::Parameterization(float uvRotateAngle)
 		}
 	}
 
-	//	output vertices
-	/*boundPoints.clear();
-	for (MyMesh::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it)
-	{
-		if (mesh.is_boundary(*v_it))
-		{
-			MyMesh::TexCoord2D texCoord = mesh.texcoord2D(*v_it);
-			std::cout << texCoord[0] << ", " << texCoord[1] << "\n";
-			boundPoints.push_back(glm::vec3(texCoord[0], texCoord[1], 0));
-		}
-		else
-		{
-		}
-	}*/
-	boundPoints.clear();
-	for (MyMesh::EdgeIter e_it = mesh.edges_begin(); e_it != mesh.edges_end(); ++e_it)
-	{
-		//if (mesh.is_boundary(*e_it))
-		{
-			MyMesh::HalfedgeHandle _heh = mesh.halfedge_handle(*e_it, 0);
-			/*MyMesh::Point pFrom = mesh.point(mesh.from_vertex_handle(_heh));
-			MyMesh::Point pTo = mesh.point(mesh.to_vertex_handle(_heh));*/
-
-
-			MyMesh::TexCoord2D texCoord = mesh.texcoord2D(mesh.from_vertex_handle(_heh));
-			boundPoints.push_back(glm::vec3(texCoord[0], texCoord[1], 0));
-
-			texCoord = mesh.texcoord2D(mesh.to_vertex_handle(_heh));
-			boundPoints.push_back(glm::vec3(texCoord[0], texCoord[1], 0));
-		}
-	}
-	///
 
 
 	// map texcoord back to origin mesh
@@ -616,12 +559,40 @@ void MeshObject::Parameterization(float uvRotateAngle)
 		}
 	}
 
+	model.LoadTexCoordToShader();
+
+	fvIDsPtr.swap(std::vector<unsigned int*>(selectedFace.size()));
+	for (int i = 0; i < fvIDsPtr.size(); ++i)
+	{
+		fvIDsPtr[i] = (GLuint*)(selectedFace[i] * 3 * sizeof(GLuint));
+	}
+	elemCount.swap(std::vector<int>(selectedFace.size(), 3));
+
+
+	// debug
+	OpenMesh::IO::Options wopt;
+	wopt += OpenMesh::IO::Options::VertexTexCoord;
+	wopt += OpenMesh::IO::Options::VertexNormal;
+
+	if (!OpenMesh::IO::write_mesh(model.mesh, "debug.obj", wopt))
+	{
+		printf("Write Mesh Error\n");
+	}
+
+}
+
+void MeshObject::RenderParameterized()
+{
+	if (model.mesh.has_vertex_texcoords2D())
+	{
+		glBindVertexArray(model.vao);
+		glMultiDrawElements(GL_TRIANGLES, &elemCount[0], GL_UNSIGNED_INT, (const GLvoid **)&fvIDsPtr[0], elemCount.size());
+		glBindVertexArray(0);
+	}
 }
 
 void MeshObject::CopySelectFace(MyMesh& mesh)
 {
-	mesh.clear();
-
 	mesh.request_vertex_normals();
 	mesh.request_face_normals();
 
@@ -660,11 +631,42 @@ void MeshObject::CopySelectFace(MyMesh& mesh)
 	}
 
 	mesh.update_normals();
-
 }
 
-// Will
-void MeshObject::reInitPatch()
+void MeshObject::DeleteSelectedFace(unsigned int faceID)
 {
-	patch.mesh.clear();
+	selectedFace.erase(std::remove(selectedFace.begin(), selectedFace.end(), faceID), selectedFace.end());
+}
+
+bool MeshObject::FindClosestPoint(unsigned int faceID, glm::vec3 worldPos, glm::vec3& closestPos)
+{
+	OpenMesh::FaceHandle fh = model.mesh.face_handle(faceID);
+	if (!fh.is_valid())
+	{
+		return false;
+	}
+
+	double minDistance = 0.0;
+	MyMesh::Point p(worldPos.x, worldPos.y, worldPos.z);
+	MyMesh::FVIter fv_it = model.mesh.fv_iter(fh);
+	MyMesh::VertexHandle closestVH = *fv_it;
+	MyMesh::Point v1 = model.mesh.point(*fv_it);
+	++fv_it;
+
+	minDistance = (p - v1).norm();
+	for (; fv_it.is_valid(); ++fv_it)
+	{
+		MyMesh::Point v = model.mesh.point(*fv_it);
+		double distance = (p - v).norm();
+		if (minDistance > distance)
+		{
+			minDistance = distance;
+			closestVH = *fv_it;
+		}
+	}
+	MyMesh::Point closestPoint = model.mesh.point(closestVH);
+	closestPos.x = closestPoint[0];
+	closestPos.y = closestPoint[1];
+	closestPos.z = closestPoint[2];
+	return true;
 }

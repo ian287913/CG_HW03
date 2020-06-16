@@ -27,12 +27,12 @@ bool DrawModelShader::Init()
 	{
 		return false;
 	}
-	
+
 	if (!AddShader(GL_FRAGMENT_SHADER, ResourcePath::shaderPath + "drawModel.fs.glsl"))
 	{
 		return false;
 	}
-	
+
 	if (!Finalize())
 	{
 		return false;
@@ -86,7 +86,7 @@ bool DrawModelShader::Init()
 		puts("Get uniform loaction error: useLighting");
 		return false;
 	}
-	
+
 
 	drawWireframeLocation = GetUniformLocation("drawWireframe");
 	if (drawWireframeLocation == -1)
@@ -109,7 +109,7 @@ bool DrawModelShader::Init()
 		return false;
 	}
 
-	
+
 	return true;
 }
 

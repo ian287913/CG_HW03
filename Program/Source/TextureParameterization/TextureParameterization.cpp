@@ -78,7 +78,8 @@ float debug_y = 0;
 float debug_z = 0;
 
 //	texture
-GLuint TextureID;
+GLuint	textureID;
+
 /////	ian		/////
 
 
@@ -98,6 +99,29 @@ void SetupGUI()
 	SelectionModeType = TwDefineEnum("SelectionModeType", SelectionModeEV, 4);
 	// Adding season to bar
 	TwAddVarRW(bar, "SelectionMode", SelectionModeType, &selectionMode, NULL);
+}
+
+void My_LoadTextures()
+{
+	//Texture setting
+	///////////////////////////	
+	//Load texture data from file
+	///TextureData tdata = Common::Load_png((ResourcePath::imagePath + "checkerboard4.jpg").c_str());
+	TextureData tdata = Common::Load_png((ResourcePath::imagePath + "checkerboard4.png").c_str());
+	//TextureData tdata = Common::Load_png(("./Imgs/" + ProjectName + "/wood.png").c_str());
+
+	//Generate empty texture
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	//Do texture setting
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, tdata.width, tdata.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tdata.data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	///////////////////////////	
 }
 
 void My_LoadModel()
@@ -158,6 +182,7 @@ void InitData()
 	mapPanel.Init();
 
 	//Load model to shader program
+	My_LoadTextures();
 	My_LoadModel();
 }
 
@@ -304,7 +329,40 @@ void RenderMeshWindow()
 	}
 	if (selectionMode == SelectionMode::SELECT_TARGETS)
 	{
-		if (updateFlag)
+		///////////////////////////	
+
+		glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		drawModelShader.Enable();
+
+		/*float radian = uvRotateAngle * M_PI / 180.0f;
+		glm::mat4 uvRotMat = glm::rotate(radian, glm::vec3(0.0, 0.0, 1.0));*/
+
+		drawModelShader.SetWireColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		drawModelShader.SetFaceColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		drawModelShader.UseLighting(true);
+		drawModelShader.DrawTexCoord(false);
+		drawModelShader.DrawTexture(false);
+		drawModelShader.DrawWireframe(true);
+		drawModelShader.SetNormalMat(normalMat);
+		drawModelShader.SetMVMat(mvMat);
+		drawModelShader.SetPMat(pMat);
+		//drawModelShader.SetUVRotMat(uvRotMat);
+
+		model.Render();
+		drawModelShader.DrawTexture(true);
+
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		model.RenderParameterized();
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+
+		drawModelShader.Disable();
+		///////////////////////////	
+
+
+		/*if (updateFlag)
 		{
 			float depthValue = 0;
 			int windowX = currentMouseX;
@@ -344,9 +402,11 @@ void RenderMeshWindow()
 			drawPointShader.Disable();
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		}
+		}*/
 
 	}
+
+	
 
 	if (drawMap)
 	{

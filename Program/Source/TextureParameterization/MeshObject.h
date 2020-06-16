@@ -83,13 +83,14 @@ public:
 	// Will
 
 	bool Init(std::string fileName);
+	void GLMesh::LoadTexCoordToShader();
 	void Render();
 
 	MyMesh mesh;
 	MyMesh *mesh_p;
 	GLuint vao;
 	GLuint ebo;
-	GLuint vboVertices, vboNormal;
+	GLuint vboVertices, vboNormal, vboTexCoord;
 
 private:
 	bool LoadModel(std::string fileName);
@@ -116,6 +117,7 @@ public:
 	std::vector<int> GetSelectedFaces();
 	void MeshObject::Parameterization(float uvRotateAngle);
 	std::vector<glm::vec3> boundPoints;
+	void MeshObject::RenderParameterized();
 
 private:
 	GLMesh model;
